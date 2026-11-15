@@ -1,0 +1,1134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electric Blue Turing Lab</title>
+
+<style>
+:root {
+  --bg: #020617;
+  --panel: #071735;
+  --blue: #005bff;
+  --bright: #087cff;
+  --cyan: #38bdf8;
+  --text: #eff6ff;
+  --muted: #a3b9df;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font: 15px "Segoe UI", Arial, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at top, #073d9b, #020617 48%);
+}
+
+header {
+  padding: 22px 6%;
+  background: #020d27;
+  border-bottom: 1px solid #1262ed;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #4eb4ff;
+}
+
+main {
+  max-width: 1180px;
+  margin: auto;
+  padding: 20px;
+}
+
+.hero { text-align: center; padding: 28px 0; }
+
+h1 {
+  font-size: clamp(30px, 5vw, 48px);
+  color: #60bdff;
+  text-shadow: 0 0 25px #007bff;
+}
+
+h2 { color: #6bc3ff; margin-top: 0; }
+h3 { color: #75c7ff; }
+p, li { line-height: 1.75; }
+.muted { color: var(--muted); }
+
+.formula {
+  display: inline-block;
+  background: #06266c;
+  border: 1px solid #177aff;
+  border-radius: 12px;
+  padding: 15px 25px;
+  color: #9bdaff;
+  font-size: 21px;
+}
+
+.card {
+  background: linear-gradient(140deg, #0a2554, #06112a);
+  border: 1px solid #1459c5;
+  border-radius: 17px;
+  padding: 24px;
+  margin: 24px 0;
+  box-shadow: 0 12px 35px #0006;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.tile {
+  padding: 18px;
+  background: #04132f;
+  border: 1px solid #1b5fce;
+  border-radius: 12px;
+}
+
+.tile strong {
+  display: block;
+  color: #65c6ff;
+  margin-bottom: 10px;
+}
+
+.controls, .examples {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+input {
+  flex: 1;
+  min-width: 180px;
+  padding: 14px;
+  background: #020b22;
+  border: 1px solid #1677ff;
+  border-radius: 9px;
+  color: white;
+  font-size: 17px;
+}
+
+button {
+  border: none;
+  border-radius: 9px;
+  padding: 13px 18px;
+  background: #075cff;
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 0 12px #0659ff55;
+}
+
+button:hover {
+  background: #248bff;
+  box-shadow: 0 0 20px #087cff;
+}
+
+button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.secondary { background: #183b75; }
+
+.examples button {
+  background: #092f80;
+  border: 1px solid #237aff;
+  font-family: monospace;
+}
+
+.stat {
+  background: #031536;
+  border: 1px solid #1767e6;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+}
+
+.stat small {
+  display: block;
+  color: #9db7df;
+}
+
+.stat b {
+  display: block;
+  color: #69c9ff;
+  font-size: 22px;
+  margin-top: 10px;
+}
+
+.tape-wrap {
+  overflow-x: auto;
+  background: #020b20;
+  border: 1px solid #1c64cc;
+  border-radius: 12px;
+  padding: 45px 12px 22px;
+}
+
+.tape {
+  display: flex;
+  gap: 5px;
+  width: max-content;
+  min-width: 100%;
+  justify-content: center;
+}
+
+.cell {
+  position: relative;
+  width: 48px;
+  height: 54px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: #102d57;
+  border: 1px solid #3472bb;
+  border-radius: 7px;
+  font: bold 22px Consolas, monospace;
+}
+
+.cell.current {
+  background: #065bff;
+  border-color: #a5e2ff;
+  box-shadow: 0 0 20px #0088ff;
+}
+
+.cell.current::before {
+  content: "▼";
+  position: absolute;
+  top: -27px;
+  color: #60d3ff;
+}
+
+.cell.marked { color: #54d1ff; }
+.cell.hash { color: #ffd166; }
+
+.diagram-wrap {
+  overflow-x: auto;
+  background: #020d25;
+  border: 1px solid #135bd4;
+  border-radius: 12px;
+}
+
+#diagram {
+  display: block;
+  width: 100%;
+  min-width: 900px;
+  height: auto;
+}
+
+.edge {
+  fill: none;
+  stroke: #4382d5;
+  stroke-width: 2.5;
+}
+
+.edge.active {
+  stroke: #19b5ff;
+  stroke-width: 5;
+  filter: drop-shadow(0 0 7px #008cff);
+}
+
+.node circle {
+  fill: #0a285c;
+  stroke: #478fe6;
+  stroke-width: 2.5;
+}
+
+.node text {
+  fill: white;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.node.active circle {
+  fill: #005cff;
+  stroke: #b5e8ff;
+  stroke-width: 5;
+  filter: drop-shadow(0 0 10px #008cff);
+}
+
+.node.accept circle { stroke: #4ade80; }
+.node.reject circle { stroke: #fb7185; }
+
+.node.active.accept circle { fill: #117b4b; }
+.node.active.reject circle { fill: #9d174d; }
+
+.edge-label {
+  fill: #b9dcff;
+  font-size: 12px;
+  text-anchor: middle;
+}
+
+.path-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 17px;
+  min-height: 70px;
+  background: #020d27;
+  border: 1px solid #1b62d4;
+  border-radius: 12px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.path-state {
+  padding: 9px 13px;
+  background: #09387f;
+  border: 1px solid #1a7dff;
+  border-radius: 25px;
+  font: bold 13px Consolas, monospace;
+}
+
+.path-state.latest {
+  background: #0864ff;
+  box-shadow: 0 0 15px #087cff;
+}
+
+.path-state.ok {
+  background: #086a42;
+  border-color: #22c55e;
+}
+
+.path-state.bad {
+  background: #8e173f;
+  border-color: #fb7185;
+}
+
+.path-arrow {
+  color: #52b9ff;
+  font-size: 19px;
+}
+
+.result {
+  padding: 20px;
+  text-align: center;
+  background: #082657;
+  border: 1px solid #1b72ff;
+  border-radius: 12px;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.result.accept {
+  color: #4ade80;
+  background: #05291e;
+  border-color: #22c55e;
+}
+
+.result.reject {
+  color: #fb7185;
+  background: #300c20;
+  border-color: #f43f5e;
+}
+
+.log {
+  background: #020b1e;
+  border: 1px solid #1c63c8;
+  border-radius: 10px;
+  padding: 16px;
+  height: 230px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font: 13px/1.8 Consolas, monospace;
+  color: #b7ddff;
+}
+
+.table-wrap { overflow-x: auto; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 11px 13px;
+  text-align: left;
+  border-bottom: 1px solid #21518d;
+}
+
+th {
+  color: #8ed6ff;
+  background: #0b3474;
+}
+
+#transitionNow {
+  color: #78d0ff;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+footer {
+  text-align: center;
+  padding: 28px;
+  color: #91acd4;
+}
+
+@media(max-width:700px) {
+  .grid { grid-template-columns: 1fr; }
+  .controls { flex-direction: column; }
+  .controls button { width: 100%; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">◈ TURING LAB</div>
+  <div class="muted">THEORY OF COMPUTATION | ASSIGNMENT 60</div>
+</header>
+
+<main>
+
+<section class="hero">
+  <h1>INTERACTIVE TURING MACHINE</h1>
+  <p>Binary String Equality Recognition</p>
+  <div class="formula">L = { x#x | x ∈ {0,1}* }</div>
+  <p>Register Number: RA2411003010026</p>
+</section>
+
+<section class="card">
+  <h2>01 / Concept & Working Principle</h2>
+
+  <p>
+    A <b>Turing Machine</b> is a mathematical model
+    of computation that uses a tape, read/write head
+    and finite states to process symbols.
+  </p>
+
+  <p>
+    This machine recognizes the language
+    <b>L = {x#x | x ∈ {0,1}*}</b>.
+    It accepts two identical binary strings separated
+    by exactly one # symbol.
+  </p>
+
+  <div class="grid">
+    <div class="tile">
+      <strong>Input Alphabet</strong>
+      Σ = {0, 1, #}
+    </div>
+    <div class="tile">
+      <strong>Tape Alphabet</strong>
+      Γ = {0, 1, #, X, Y, B}
+    </div>
+    <div class="tile">
+      <strong>Marking Technique</strong>
+      X = processed 0<br>
+      Y = processed 1<br>
+      B = blank
+    </div>
+  </div>
+
+  <h3>Working Algorithm</h3>
+  <ol>
+    <li>Find the first unmarked left-side symbol.</li>
+    <li>Mark 0 as X or 1 as Y.</li>
+    <li>Move right across the # separator.</li>
+    <li>Find the next unmarked right-side symbol.</li>
+    <li>Compare and mark it if matching.</li>
+    <li>Return left and repeat.</li>
+    <li>Accept only when both strings are fully matched.</li>
+  </ol>
+
+  <p class="muted">
+    Example: 101#101 is accepted.
+    101#100 is rejected.
+    # is accepted because x may be empty.
+  </p>
+</section>
+
+<section class="card">
+  <h2>02 / Input & Controls</h2>
+
+  <div class="controls">
+    <input id="input" value="101#101"
+           placeholder="Enter binary string">
+
+    <button onclick="loadMachine()">LOAD INPUT</button>
+    <button id="stepBtn" onclick="stepMachine()">STEP</button>
+    <button id="runBtn" onclick="runMachine()">▶ RUN</button>
+    <button class="secondary" onclick="pauseMachine()">PAUSE</button>
+    <button class="secondary" onclick="loadMachine()">RESET</button>
+  </div>
+
+  <p class="muted">Quick Test Cases</p>
+  <div class="examples">
+    <button onclick="setExample('#')">#</button>
+    <button onclick="setExample('0#0')">0#0</button>
+    <button onclick="setExample('101#101')">101#101</button>
+    <button onclick="setExample('0#1')">0#1</button>
+    <button onclick="setExample('01#10')">01#10</button>
+    <button onclick="setExample('1#11')">1#11</button>
+  </div>
+</section>
+
+<section class="card">
+  <h2>03 / Machine Status</h2>
+
+  <div class="grid">
+    <div class="stat">
+      <small>CURRENT STATE</small>
+      <b id="state">qStart</b>
+    </div>
+    <div class="stat">
+      <small>HEAD POSITION</small>
+      <b id="head">0</b>
+    </div>
+    <div class="stat">
+      <small>TRANSITIONS</small>
+      <b id="count">0</b>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>04 / Live Tape Visualization</h2>
+  <p class="muted">
+    Blue glow = active head |
+    X/Y = processed symbols |
+    # = separator
+  </p>
+  <div class="tape-wrap">
+    <div class="tape" id="tape"></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>05 / Complete State Transition Diagram</h2>
+
+  <p class="muted">
+    The complete machine remains fixed.
+    The current state and latest transition are
+    highlighted in electric blue during execution.
+  </p>
+
+  <div class="diagram-wrap">
+    <svg id="diagram"
+         viewBox="0 0 1050 630"
+         xmlns="http://www.w3.org/2000/svg">
+    </svg>
+  </div>
+
+  <div id="transitionNow">
+    Current transition: Ready
+  </div>
+
+  <p class="muted">
+    Transition notation: Read / Write, Move.
+    The diagram shows the main state changes.
+    All exact rules appear in the transition table.
+  </p>
+</section>
+
+<section class="card">
+  <h2>06 / Live Execution Path</h2>
+
+  <p class="muted">
+    This path changes according to the selected input.
+    Every visited state is recorded during execution.
+  </p>
+
+  <div class="path-box" id="path"></div>
+</section>
+
+<section class="card">
+  <h2>07 / Final Simulation Result</h2>
+  <div class="result" id="result">READY TO SIMULATE</div>
+</section>
+
+<section class="card">
+  <h2>08 / Execution Log</h2>
+  <div class="log" id="log"></div>
+</section>
+
+<section class="card">
+  <h2>09 / Complete Transition Table</h2>
+
+  <p class="muted">
+    δ(Current State, Read Symbol) =
+    (Next State, Write Symbol, Direction)
+  </p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Current State</th>
+          <th>Read</th>
+          <th>Next State</th>
+          <th>Write</th>
+          <th>Move</th>
+        </tr>
+      </thead>
+      <tbody id="rules"></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card">
+  <h2>10 / Sample Test Cases</h2>
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Input</th>
+        <th>Expected Result</th>
+        <th>Reason</th>
+      </tr>
+      <tr><td>#</td><td>Accepted</td><td>Empty strings</td></tr>
+      <tr><td>0#0</td><td>Accepted</td><td>Same symbol</td></tr>
+      <tr><td>101#101</td><td>Accepted</td><td>Identical strings</td></tr>
+      <tr><td>0#1</td><td>Rejected</td><td>Symbol mismatch</td></tr>
+      <tr><td>01#10</td><td>Rejected</td><td>Wrong order</td></tr>
+      <tr><td>1#11</td><td>Rejected</td><td>Unequal lengths</td></tr>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  THEORY OF COMPUTATION | ELECTRIC BLUE TURING LAB
+</footer>
+
+<script>
+const B = "B";
+
+let tape = [];
+let head = 0;
+let state = "qStart";
+let steps = 0;
+let halted = false;
+let timer = null;
+let history = [];
+let lastEdge = "";
+
+const $ = id => document.getElementById(id);
+
+// Exact Turing Machine transition function
+const T = {
+  qStart: {
+    "0": ["qSeekHash0", "X", 1],
+    "1": ["qSeekHash1", "Y", 1],
+    "X": ["qStart", "X", 1],
+    "Y": ["qStart", "Y", 1],
+    "#": ["qVerify", "#", 1],
+    "B": ["qReject", "B", 0]
+  },
+
+  qSeekHash0: {
+    "0": ["qSeekHash0", "0", 1],
+    "1": ["qSeekHash0", "1", 1],
+    "X": ["qSeekHash0", "X", 1],
+    "Y": ["qSeekHash0", "Y", 1],
+    "#": ["qMatch0", "#", 1],
+    "B": ["qReject", "B", 0]
+  },
+
+  qSeekHash1: {
+    "0": ["qSeekHash1", "0", 1],
+    "1": ["qSeekHash1", "1", 1],
+    "X": ["qSeekHash1", "X", 1],
+    "Y": ["qSeekHash1", "Y", 1],
+    "#": ["qMatch1", "#", 1],
+    "B": ["qReject", "B", 0]
+  },
+
+  qMatch0: {
+    "X": ["qMatch0", "X", 1],
+    "Y": ["qMatch0", "Y", 1],
+    "0": ["qReturn", "X", -1],
+    "1": ["qReject", "1", 0],
+    "#": ["qReject", "#", 0],
+    "B": ["qReject", "B", 0]
+  },
+
+  qMatch1: {
+    "X": ["qMatch1", "X", 1],
+    "Y": ["qMatch1", "Y", 1],
+    "1": ["qReturn", "Y", -1],
+    "0": ["qReject", "0", 0],
+    "#": ["qReject", "#", 0],
+    "B": ["qReject", "B", 0]
+  },
+
+  qReturn: {
+    "0": ["qReturn", "0", -1],
+    "1": ["qReturn", "1", -1],
+    "X": ["qReturn", "X", -1],
+    "Y": ["qReturn", "Y", -1],
+    "#": ["qReturn", "#", -1],
+    "B": ["qStart", "B", 1]
+  },
+
+  qVerify: {
+    "X": ["qVerify", "X", 1],
+    "Y": ["qVerify", "Y", 1],
+    "B": ["qAccept", "B", 0],
+    "0": ["qReject", "0", 0],
+    "1": ["qReject", "1", 0],
+    "#": ["qReject", "#", 0]
+  }
+};
+
+// State coordinates for transition diagram
+const positions = {
+  qStart: [110, 175],
+  qSeekHash0: [330, 90],
+  qSeekHash1: [330, 290],
+  qMatch0: [555, 90],
+  qMatch1: [555, 290],
+  qReturn: [795, 190],
+  qVerify: [330, 525],
+  qAccept: [555, 525],
+  qReject: [860, 525]
+};
+
+const names = {
+  qStart: "qStart",
+  qSeekHash0: "qSeek0",
+  qSeekHash1: "qSeek1",
+  qMatch0: "qMatch0",
+  qMatch1: "qMatch1",
+  qReturn: "qReturn",
+  qVerify: "qVerify",
+  qAccept: "ACCEPT",
+  qReject: "REJECT"
+};
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function svgElement(tag, attrs, parent) {
+  const el = document.createElementNS(SVG_NS, tag);
+
+  Object.entries(attrs).forEach(([key, value]) => {
+    el.setAttribute(key, value);
+  });
+
+  parent.appendChild(el);
+  return el;
+}
+
+function edgeId(from, to) {
+  return "edge-" + from + "-" + to;
+}
+
+function buildDiagram() {
+  const svg = $("diagram");
+  svg.replaceChildren();
+
+  const defs = svgElement("defs", {}, svg);
+
+  const marker = svgElement("marker", {
+    id: "arrow",
+    markerWidth: 9,
+    markerHeight: 9,
+    refX: 8,
+    refY: 4,
+    orient: "auto"
+  }, defs);
+
+  svgElement("path", {
+    d: "M0 0 L8 4 L0 8 Z",
+    fill: "#65b7ff"
+  }, marker);
+
+  // Main transitions
+  const edges = [
+    ["qStart", "qSeekHash0", "0/X,R"],
+    ["qStart", "qSeekHash1", "1/Y,R"],
+    ["qSeekHash0", "qMatch0", "#/#,R"],
+    ["qSeekHash1", "qMatch1", "#/#,R"],
+    ["qMatch0", "qReturn", "0/X,L"],
+    ["qMatch1", "qReturn", "1/Y,L"],
+    ["qReturn", "qStart", "B/B,R"],
+    ["qStart", "qVerify", "#/#,R"],
+    ["qVerify", "qAccept", "B/B,S"]
+  ];
+
+  edges.forEach(([from, to, label]) => {
+    const [x1, y1] = positions[from];
+    const [x2, y2] = positions[to];
+
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const length = Math.hypot(dx, dy);
+
+    const ux = dx / length;
+    const uy = dy / length;
+
+    const startX = x1 + ux * 42;
+    const startY = y1 + uy * 42;
+    const endX = x2 - ux * 43;
+    const endY = y2 - uy * 43;
+
+    let d;
+
+    if (from === "qReturn" && to === "qStart") {
+      d = `M${startX} ${startY}
+           Q790 445 430 450
+           Q105 465 ${endX} ${endY}`;
+    } else if (from === "qStart" && to === "qVerify") {
+      d = `M${startX} ${startY}
+           L110 525
+           L${endX} ${endY}`;
+    } else {
+      d = `M${startX} ${startY}
+           L${endX} ${endY}`;
+    }
+
+    svgElement("path", {
+      id: edgeId(from, to),
+      d,
+      class: "edge",
+      "marker-end": "url(#arrow)"
+    }, svg);
+
+    const mx = (x1 + x2) / 2;
+    const my = (y1 + y2) / 2;
+
+    const text = svgElement("text", {
+      x: mx,
+      y: my - 15,
+      class: "edge-label"
+    }, svg);
+
+    text.textContent = label;
+  });
+
+  // Self-loops and rejection rules are shown
+  // in the exact transition table.
+  const notes = [
+    [110, 95, "X,Y: scan right"],
+    [330, 25, "Seek0: scan to #"],
+    [330, 225, "Seek1: scan to #"],
+    [555, 25, "Match0: skip X,Y"],
+    [555, 225, "Match1: skip X,Y"],
+    [795, 115, "Return: scan left"],
+    [330, 455, "Verify: skip X,Y"]
+  ];
+
+  notes.forEach(([x, y, label]) => {
+    const text = svgElement("text", {
+      x, y, class: "edge-label"
+    }, svg);
+
+    text.textContent = label;
+  });
+
+  // Draw states after edges so nodes stay visible
+  Object.entries(positions).forEach(([name, [x, y]]) => {
+    let cls = "node";
+
+    if (name === "qAccept") cls += " accept";
+    if (name === "qReject") cls += " reject";
+
+    const group = svgElement("g", {
+      id: "node-" + name,
+      class: cls
+    }, svg);
+
+    svgElement("circle", {
+      cx: x, cy: y, r: 39
+    }, group);
+
+    if (name === "qAccept" || name === "qReject") {
+      svgElement("circle", {
+        cx: x,
+        cy: y,
+        r: 32,
+        fill: "none",
+        stroke: name === "qAccept" ?
+          "#4ade80" : "#fb7185",
+        "stroke-width": 2
+      }, group);
+    }
+
+    const text = svgElement("text", {
+      x, y
+    }, group);
+
+    text.textContent = names[name];
+  });
+}
+
+function pauseMachine() {
+  if (timer !== null) {
+    clearInterval(timer);
+    timer = null;
+  }
+}
+
+function setExample(value) {
+  $("input").value = value;
+  loadMachine();
+}
+
+function loadMachine() {
+  pauseMachine();
+
+  const input = $("input").value;
+
+  tape = [...input];
+  head = 0;
+  state = "qStart";
+  steps = 0;
+  halted = false;
+  history = ["qStart"];
+  lastEdge = "";
+
+  $("log").textContent =
+    "Input: " + JSON.stringify(input) +
+    "\nStarting at qStart";
+
+  $("result").className = "result";
+  $("result").textContent = "READY TO SIMULATE";
+
+  $("transitionNow").textContent =
+    "Current transition: Ready";
+
+  if (!/^[01#]*$/.test(input)) {
+    state = "qReject";
+    history.push(state);
+    finishMachine(false, "Invalid input symbol");
+    return;
+  }
+
+  render();
+}
+
+function render() {
+  const tapeElement = $("tape");
+  tapeElement.replaceChildren();
+
+  const left = Math.min(-2, head - 1);
+  const right = Math.max(tape.length + 1, head + 1);
+
+  for (let i = left; i <= right; i++) {
+    const symbol =
+      tape[i] === undefined ? B : tape[i];
+
+    const cell = document.createElement("div");
+    cell.className = "cell";
+
+    if (i === head) cell.classList.add("current");
+    if (symbol === "X" || symbol === "Y")
+      cell.classList.add("marked");
+    if (symbol === "#")
+      cell.classList.add("hash");
+
+    cell.textContent = symbol;
+    cell.title = "Tape position " + i;
+
+    tapeElement.appendChild(cell);
+  }
+
+  $("state").textContent = state;
+  $("head").textContent = head;
+  $("count").textContent = steps;
+
+  $("stepBtn").disabled = halted;
+  $("runBtn").disabled = halted;
+
+  // Highlight active state
+  document.querySelectorAll(".node").forEach(node => {
+    node.classList.remove("active");
+  });
+
+  const activeNode = $("node-" + state);
+
+  if (activeNode) {
+    activeNode.classList.add("active");
+  }
+
+  // Highlight latest transition
+  document.querySelectorAll(".edge").forEach(edge => {
+    edge.classList.remove("active");
+  });
+
+  const activeEdge = $(lastEdge);
+
+  if (activeEdge) {
+    activeEdge.classList.add("active");
+  }
+
+  // Render input-dependent execution path
+  const path = $("path");
+  path.replaceChildren();
+
+  history.forEach((visited, index) => {
+    if (index > 0) {
+      const arrow = document.createElement("span");
+      arrow.className = "path-arrow";
+      arrow.textContent = "→";
+      path.appendChild(arrow);
+    }
+
+    const item = document.createElement("span");
+    item.className = "path-state";
+
+    if (index === history.length - 1)
+      item.classList.add("latest");
+
+    if (visited === "qAccept")
+      item.classList.add("ok");
+
+    if (visited === "qReject")
+      item.classList.add("bad");
+
+    item.textContent = names[visited] || visited;
+    path.appendChild(item);
+  });
+
+  path.scrollTop = path.scrollHeight;
+}
+
+function finishMachine(accepted, message) {
+  halted = true;
+  pauseMachine();
+
+  $("result").className =
+    "result " + (accepted ? "accept" : "reject");
+
+  $("result").textContent =
+    (accepted ? "✓ ACCEPTED — " : "✕ REJECTED — ") +
+    message;
+
+  $("log").textContent +=
+    "\nFINAL RESULT: " +
+    (accepted ? "ACCEPTED" : "REJECTED") +
+    " — " + message;
+
+  render();
+}
+
+function stepMachine() {
+  if (halted) return;
+
+  const read =
+    tape[head] === undefined ? B : tape[head];
+
+  const transition = T[state]?.[read];
+
+  if (!transition) {
+    const oldState = state;
+    state = "qReject";
+    history.push(state);
+    lastEdge = edgeId(oldState, state);
+
+    finishMachine(false, "No transition defined");
+    return;
+  }
+
+  const oldState = state;
+  const oldHead = head;
+
+  const [nextState, write, move] = transition;
+
+  tape[head] = write;
+  head += move;
+  state = nextState;
+  steps++;
+
+  lastEdge = edgeId(oldState, nextState);
+  history.push(nextState);
+
+  const direction =
+    move === 1 ? "R" :
+    move === -1 ? "L" : "S";
+
+  const message =
+    `${oldState} + ${read} → ${nextState}, ` +
+    `write ${write}, ${direction}`;
+
+  $("transitionNow").textContent =
+    "Current transition: " + message;
+
+  $("log").textContent +=
+    `\n${steps}. ${message} | ` +
+    `Head ${oldHead} → ${head}`;
+
+  $("log").scrollTop = $("log").scrollHeight;
+
+  if (state === "qAccept") {
+    finishMachine(
+      true,
+      "The two binary strings match"
+    );
+    return;
+  }
+
+  if (state === "qReject") {
+    finishMachine(
+      false,
+      "Input does not satisfy x#x"
+    );
+    return;
+  }
+
+  render();
+}
+
+function runMachine() {
+  if (halted || timer !== null) return;
+
+  timer = setInterval(() => {
+    stepMachine();
+  }, 220);
+}
+
+function buildTransitionTable() {
+  const tbody = $("rules");
+  tbody.replaceChildren();
+
+  for (const [from, rules] of Object.entries(T)) {
+    for (const [read, transition]
+      of Object.entries(rules)) {
+
+      const [to, write, move] = transition;
+
+      const row = document.createElement("tr");
+
+      const values = [
+        from,
+        read,
+        to,
+        write,
+        move === 1 ? "R" :
+        move === -1 ? "L" : "S"
+      ];
+
+      values.forEach(value => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
+
+      tbody.appendChild(row);
+    }
+  }
+}
+
+// Initialize simulator
+buildDiagram();
+buildTransitionTable();
+loadMachine();
+</script>
+
+</body>
+</html>
